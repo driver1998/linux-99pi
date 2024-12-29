@@ -18,6 +18,9 @@
 #include <asm/paravirt.h>
 #include <asm/time.h>
 
+DEFINE_SPINLOCK(rtc_lock);
+EXPORT_SYMBOL(rtc_lock);
+
 u64 cpu_clock_freq;
 EXPORT_SYMBOL(cpu_clock_freq);
 u64 const_clock_freq;
