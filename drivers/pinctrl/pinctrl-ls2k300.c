@@ -606,7 +606,7 @@ static int loongson_gpio_chip_add(struct loongson_pinctrl *pctl, struct device_n
 	gc->parent = pctl->dev;
 	gc->label = lsgc->name;
 
-	return gpiochip_add(gc);
+	return gpiochip_add_data(gc, lsgc);
 }
 
 static int loongson_gpio_register(struct loongson_pinctrl *pctl)
