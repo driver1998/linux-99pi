@@ -587,9 +587,8 @@ static int lsdc_platform_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int lsdc_platform_remove(struct platform_device *pdev)
+static void lsdc_platform_remove(struct platform_device *pdev)
 {
-	return 0;
 }
 struct platform_driver lsdc_platform_driver = {
 	.probe = lsdc_platform_probe,

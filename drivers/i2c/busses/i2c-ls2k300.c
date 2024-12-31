@@ -533,7 +533,7 @@ free_i2c_mem:
 	return ret;
 }
 
-static int ls_i2c_remove(struct platform_device *pdev)
+static void ls_i2c_remove(struct platform_device *pdev)
 {
 	struct ls_i2c_dev *i2c_dev = platform_get_drvdata(pdev);
 
@@ -541,8 +541,6 @@ static int ls_i2c_remove(struct platform_device *pdev)
 	i2c_del_adapter(&i2c_dev->adap);
 	iounmap(i2c_dev->base);
 	kfree(i2c_dev);
-
-	return 0;
 }
 
 static const struct of_device_id ls_i2c_match[] = {

@@ -227,11 +227,9 @@ static int ls_i2s_drv_probe(struct platform_device *pdev)
 	psc_i2s_dai, 1);
 }
 
-static int ls_i2s_drv_remove(struct platform_device *pdev)
+static void ls_i2s_drv_remove(struct platform_device *pdev)
 {
 	snd_soc_unregister_component(&pdev->dev);
-
-	return 0;
 }
 
 static const struct of_device_id snd_ls_i2s_dt_match[] = {

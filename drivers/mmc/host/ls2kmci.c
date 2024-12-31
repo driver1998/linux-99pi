@@ -1036,7 +1036,7 @@ static void ls2k_mci_shutdown(struct platform_device *pdev)
 	mmc_remove_host(mmc);
 }
 
-static int ls2k_mci_remove(struct platform_device *pdev)
+static void ls2k_mci_remove(struct platform_device *pdev)
 {
 	struct mmc_host		*mmc  = platform_get_drvdata(pdev);
 	struct ls2k_mci_host	*host = mmc_priv(mmc);
@@ -1050,7 +1050,6 @@ static int ls2k_mci_remove(struct platform_device *pdev)
 	release_mem_region(host->mem->start, (host->mem->end - host->mem->start + 1));
 
 	mmc_free_host(mmc);
-	return 0;
 }
 
 #ifdef CONFIG_OF

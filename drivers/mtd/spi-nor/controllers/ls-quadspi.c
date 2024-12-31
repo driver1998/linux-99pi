@@ -592,7 +592,7 @@ err_flash:
 	return ret;
 }
 
-static int ls_qspi_remove(struct platform_device *pdev)
+static void ls_qspi_remove(struct platform_device *pdev)
 {
         struct ls_qspi *qspi = platform_get_drvdata(pdev);
 
@@ -600,8 +600,6 @@ static int ls_qspi_remove(struct platform_device *pdev)
 
         ls_qspi_mtd_free(qspi);
         mutex_destroy(&qspi->lock);
-
-        return 0;
 }
 
 static const struct of_device_id loongson_qspi_match[] = {

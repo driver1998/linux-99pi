@@ -816,7 +816,7 @@ err_no_iomap:
     return 0;
 }
 
-static int ls_spi_remove(struct platform_device *dev)
+static void ls_spi_remove(struct platform_device *dev)
 {
     struct ls_spi *ls_spi =platform_get_drvdata(dev);
 
@@ -832,8 +832,6 @@ static int ls_spi_remove(struct platform_device *dev)
     kfree(ls_spi);
 
     dev_info(&dev->dev,"driver remove\n");
-
-    return 0;
 }
 
 #ifdef CONFIG_PM

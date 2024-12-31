@@ -207,10 +207,9 @@ static int ls_sound_drv_probe(struct platform_device *pdev)
 
 }
 
-static int ls_sound_drv_remove(struct platform_device *pdev)
+static void ls_sound_drv_remove(struct platform_device *pdev)
 {
 	platform_device_unregister(loongson_snd_device);
-	return 0;
 }
 static const struct of_device_id snd_ls_sound_dt_match[] = {
 	{ .compatible = "loongson,ls-sound", },

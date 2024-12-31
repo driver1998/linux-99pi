@@ -451,7 +451,7 @@ fail1:
 	return -EIO;
 }
 
-static int ls2x_rtc_remove(struct platform_device *pdev)
+static void ls2x_rtc_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct ls2x_rtc_info *info = platform_get_drvdata(pdev);
@@ -466,8 +466,6 @@ static int ls2x_rtc_remove(struct platform_device *pdev)
 	unregister_ls_acpi_pm_notifier(&rtc_pm_acpi_notifier);
 #endif
 	kfree(info);
-
-	return 0;
 }
 
 static int ls2x_rtc_suspend(struct device *dev)

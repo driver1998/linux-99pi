@@ -282,17 +282,15 @@ static int ls_pwm_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int ls_pwm_remove(struct platform_device *pdev)
+static void ls_pwm_remove(struct platform_device *pdev)
 {
 	struct ls_pwm_chip *pwm = platform_get_drvdata(pdev);
 
 	if (!pwm)
-		return -ENODEV;
+		return;
 
 	free_irq(pwm->irq, NULL);
 	pwmchip_remove(&pwm->chip);
-
-	return 0;
 }
 
 #ifdef CONFIG_OF

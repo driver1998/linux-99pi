@@ -908,10 +908,9 @@ static int ls_soc_probe(struct platform_device *pdev)
 	return ls_snd_soc_register_component(pdev);
 }
 #endif
-static int ls_soc_remove(struct platform_device *pdev)
+static void ls_soc_remove(struct platform_device *pdev)
 {
 	snd_soc_unregister_component(&pdev->dev);
-	return 0;
 }
 
 #ifdef CONFIG_OF
