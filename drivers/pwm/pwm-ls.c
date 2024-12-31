@@ -38,13 +38,11 @@
 #define CTRL_INVERT BIT(9)
 #define CTRL_DZONE BIT(10)
 
-#define to_ls_pwm_chip(_chip) container_of(_chip, struct ls_pwm_chip, chip)
 #define NS_IN_HZ (1000000000UL)
 #define CPU_FRQ_PWM (50000000UL)
 
 struct ls_pwm_chip
 {
-	struct pwm_chip chip;
 	void __iomem *mmio_base;
 	/* following registers used for suspend/resume */
 	u32 irq;
@@ -53,6 +51,11 @@ struct ls_pwm_chip
 	u32 full_buffer_reg;
 	u64 clock_frequency;
 };
+
+static inline struct ls_pwm_chip *to_ls_pwm_chip(struct pwm_chip *chip)
+{
+	return pwmchip_get_drvdata(chip);
+}
 
 static int ls_pwm_set_polarity(struct pwm_chip *chip,
 							   struct pwm_device *pwm,
@@ -221,6 +224,7 @@ static irqreturn_t pwm_ls2x_isr(int irq, void *dev)
 static int ls_pwm_probe(struct platform_device *pdev)
 {
 	struct ls_pwm_chip *pwm;
+	struct pwm_chip *chip;
 	struct resource *mem;
 	int err;
 	struct device_node *np = pdev->dev.of_node;
@@ -234,16 +238,12 @@ static int ls_pwm_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	pwm = devm_kzalloc(&pdev->dev, sizeof(*pwm), GFP_KERNEL);
-	if (!pwm)
-	{
-		dev_err(&pdev->dev, "failed to allocate memory\n");
-		return -ENOMEM;
-	}
+	chip = devm_pwmchip_alloc(&pdev->dev, 1, sizeof(*pwm));
+	if (IS_ERR(chip))
+		return PTR_ERR(chip);
+	pwm = to_ls_pwm_chip(chip);
 
-	pwm->chip.dev = &pdev->dev;
-	pwm->chip.ops = &ls_pwm_ops;
-	pwm->chip.npwm = 1;
+	chip->ops = &ls_pwm_ops;
 
 	if (!(of_property_read_u32(np, "clock-frequency", &clk)))
 		pwm->clock_frequency = clk;
@@ -270,27 +270,28 @@ static int ls_pwm_probe(struct platform_device *pdev)
 	if (err < 0)
 		dev_err(&pdev->dev, "failure requesting irq %d\n", err);
 
-	err = pwmchip_add(&pwm->chip);
+	err = pwmchip_add(chip);
 	if (err < 0)
 	{
 		dev_err(&pdev->dev, "pwmchip_add() failed: %d\n", err);
 		return err;
 	}
 
-	platform_set_drvdata(pdev, pwm);
+	platform_set_drvdata(pdev, chip);
 	dev_dbg(&pdev->dev, "pwm probe successful\n");
 	return 0;
 }
 
 static void ls_pwm_remove(struct platform_device *pdev)
 {
-	struct ls_pwm_chip *pwm = platform_get_drvdata(pdev);
+	struct pwm_chip *chip = platform_get_drvdata(pdev);
+	struct ls_pwm_chip *pwm = to_ls_pwm_chip(chip);
 
 	if (!pwm)
 		return;
 
 	free_irq(pwm->irq, NULL);
-	pwmchip_remove(&pwm->chip);
+	pwmchip_remove(chip);
 }
 
 #ifdef CONFIG_OF
@@ -306,7 +307,8 @@ MODULE_DEVICE_TABLE(of, ls_pwm_id_table);
 #ifdef CONFIG_PM_SLEEP
 static int ls_pwm_suspend(struct device *dev)
 {
-	struct ls_pwm_chip *ls_pwm = dev_get_drvdata(dev);
+	struct pwm_chip *chip = dev_get_drvdata(dev);
+	struct ls_pwm_chip *ls_pwm = to_ls_pwm_chip(chip);
 
 	ls_pwm->ctrl_reg = readl(ls_pwm->mmio_base + CTRL);
 	ls_pwm->low_buffer_reg = readl(ls_pwm->mmio_base + LOW_BUFFER);
@@ -316,7 +318,8 @@ static int ls_pwm_suspend(struct device *dev)
 
 static int ls_pwm_resume(struct device *dev)
 {
-	struct ls_pwm_chip *ls_pwm = dev_get_drvdata(dev);
+	struct pwm_chip *chip = dev_get_drvdata(dev);
+	struct ls_pwm_chip *ls_pwm = to_ls_pwm_chip(chip);
 
 	writel(ls_pwm->ctrl_reg, ls_pwm->mmio_base + CTRL);
 	writel(ls_pwm->low_buffer_reg, ls_pwm->mmio_base + LOW_BUFFER);
